@@ -8,6 +8,7 @@ WorkingDirectory=/home/todoapp/app
 Type=simple
 User=todoapp
 ExecStart=/usr/bin/node /home/todoapp/app/server.js
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
