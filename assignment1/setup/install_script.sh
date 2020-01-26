@@ -61,7 +61,7 @@ install_app_as_user () {
         cd $CLONETARGET
         git pull $REPOSRC
     fi
-    git clone https://github.com/timoguic/ACIT4640-todo-app.git "$CLONETARGET"
+    
     cd /home/todoapp/app
     npm install
     chown -R "$APPUSER" /home/todoapp/
