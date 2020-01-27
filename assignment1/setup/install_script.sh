@@ -82,4 +82,3 @@ sec_config
 install_packages
 install_app_as_user
 cofigure_node_service
-
