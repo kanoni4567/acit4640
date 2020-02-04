@@ -7,11 +7,11 @@ NET_NAME="net4640auto"
 VM_NAME="VM4640auto"
 SSH_PORT="8022"
 WEB_PORT="8000"
-PXE_SSH_PORT="12222"
+# PXE_SSH_PORT="12222"
 SUBNET="192.168.233.0/24"
 PORT_RULE_SSH="my_ssh_rule:tcp:[127.0.0.1]:$SSH_PORT:[192.168.233.10]:22"
 PORT_RULE_HTTP="my_http_rule:tcp:[127.0.0.1]:$WEB_PORT:[192.168.233.10]:80"
-PORT_RULT_PXE_SSH="pxe_ssh_rule:tcp:[127.0.0.1]:$PXE_SSH_PORT:[192.168.230.200]:22"
+PORT_RULT_PXE_SSH="pxe_ssh_rule:tcp:[127.0.0.1]:$PXE_SSH_PORT:[$PXE_IP]:22"
 STORAGE_CONTROLLER_NAME="SataController"
 # ISO_PATH="C:\\Users\\cuish\\Documents\\acit4640-provision\\CentOS-7-x86_64-Minimal-1908.iso"
 
@@ -28,7 +28,9 @@ create_network () {
         --enable\
         --dhcp off\
         --port-forward-4 "$PORT_RULE_SSH"\
-        --port-forward-4 "$PORT_RULE_HTTP"
+        --port-forward-4 "$PORT_RULE_HTTP"\
+        --port-forward-4 "$PORT_RULT_PXE_SSH"
+
 }
 
 create_vm () {
@@ -79,19 +81,12 @@ create_vm () {
     #     --medium "$ISO_PATH"
 }
 
-configure_pxe_machine () {
-    ssh -i ~/.ssh/acit_admin_id_rsa admin@localhost\
-        -p "$PXE_SSH_PORT"\
-        "sudo chmod 755 /var/www/lighttpd; sudo chown admin /var/www/lighttpd/files;\
-        sudo sed -r -i 's/^(%wheel\s+ALL=\(ALL\)\s+)(ALL)$/\1NOPASSWD: ALL/' /etc/sudoers"
-    scp -i ~/.ssh/acit_admin_id_rsa -P "$PXE_SSH_PORT" ./acit_admin_id_rsa.pub admin@localhost:/var/www/lighttpd/files/public_key
-}
+
 
 echo "Starting script..."
 
 clean_all
 create_network
 create_vm
-configure_pxe_machine
 
 echo "DONE!"
