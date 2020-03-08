@@ -74,5 +74,12 @@
                 "chmod 644 ~{{ user `admin_user`}}/.ssh/authorized_keys"
             ]
         }
+    ],
+    "post-processors": [
+        {
+            "type": "vagrant",
+            "keep_input_artifact": true,
+            "output": "base_4640.box"
+        }
     ]
 }

@@ -1,0 +1,79 @@
+---
+- hosts: all
+  vars:
+    todo_user: todoapp
+  tasks:
+    - name: Add the user 'todoapp'
+      become: yes
+      user:
+        name: "{{todo_user}}"
+    - name: Change todo user's home folder permission
+      become: yes
+      file:
+        path: /home/{{todo_user}}
+        recurse: yes
+        mode: '0755'
+    - name: Install nginx, nodejs, git, mongodb-server, mongodb
+      become: yes
+      package:
+        name: 
+          - nginx
+          - git
+          - nodejs
+          - mongodb-server
+          - mongodb
+        state: present
+    - name: Copy nginx config
+      become: yes
+      template:
+        src: ./files/nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+        owner: nginx
+    - name: Enable and start nginx
+      become: yes
+      service:
+        name: nginx
+        enabled: yes
+        state: started
+    - name: Enable and start mongod
+      become: yes
+      service:
+        name: mongod
+        enabled: yes
+        state: started
+    - name: Clone app repo
+      become: yes
+      git:
+        repo: https://github.com/timoguic/ACIT4640-todo-app.git
+        force: yes
+        dest: /home/{{todo_user}}/app
+    - name: Change database configuration
+      become: yes
+      replace:
+        path: /home/{{todo_user}}/app/config/database.js
+        regexp: 'CHANGEME'
+        replace: 'acit4640'
+    - name: Install npm packages based on package.json.
+      become: yes
+      npm:
+        path: /home/{{todo_user}}/app
+    - name: Copy todoapp.service
+      become: yes
+      template:
+        src: ./files/todoapp.service.j2
+        dest: /etc/systemd/system/todoapp.service
+    - name: Enable and start todoapp.service
+      become: yes
+      systemd: 
+        state: started
+        enabled: yes
+        name: todoapp
+        daemon_reload: yes
+    - name: Copy mongodb archive
+      become: yes
+      copy:
+        src: ./files/ACIT4640
+        dest: /home/{{todo_user}}/setup/
+    - name: Restore mongo data
+      command: mongorestore -d acit4640 /home/{{todo_user}}/setup/ACIT4640
+
