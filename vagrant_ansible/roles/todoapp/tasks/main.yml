@@ -15,4 +15,4 @@
     name: todoapp_service
   vars:
     todoapp_port: 8080
-    todoapp_user: {{todo_user}}
+    todoapp_user: "{{todo_user}}"

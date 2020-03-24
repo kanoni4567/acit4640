@@ -16,15 +16,20 @@
   become: yes
   npm:
     path: /home/{{todo_user}}/app
+- name: check if service file exists
+  stat: 
+    path: /etc/systemd/system/todoapp.service
+  register: todoapp_service_exist
 - name: Copy todoapp.service
   become: yes
   template:
     src: ./templates/todoapp.service.j2
     dest: /etc/systemd/system/todoapp.service
-- name: Enable and start todoapp.service
+  when: todoapp_service_exist.stat.exists == False
+- name: Enable and restart todoapp.service
   become: yes
   systemd: 
-    state: started
+    state: restarted
     enabled: yes
     name: todoapp
     daemon_reload: yes

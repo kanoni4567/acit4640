@@ -3,8 +3,8 @@
   gather_facts: no
   roles: 
     - todoapp
-  # vars:
-  #   todo_user: todoapp
+  vars:
+    todo_user: todoapp
   # tasks:
   #   - name: Add the user 'todoapp'
   #     become: yes
