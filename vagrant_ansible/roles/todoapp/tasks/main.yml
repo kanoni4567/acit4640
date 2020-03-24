@@ -1,0 +1,18 @@
+---
+# tasks file for todoapp
+- name: Add the user 'todoapp'
+  become: yes
+  user:
+    name: "{{todo_user}}"
+- name: Change todo user's home folder permission
+  become: yes
+  file:
+    path: /home/{{todo_user}}
+    recurse: yes
+    mode: '0755'
+- name: Install app
+  include_role:
+    name: todoapp_service
+  vars:
+    todoapp_port: 8080
+    todoapp_user: {{todo_user}}

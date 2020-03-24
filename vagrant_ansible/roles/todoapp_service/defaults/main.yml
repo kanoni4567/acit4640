@@ -1,0 +1,4 @@
+---
+# defaults file for todoapp_service
+todoapp_port: 8080
+todo_user: todoapp
