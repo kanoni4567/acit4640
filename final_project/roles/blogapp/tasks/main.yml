@@ -5,11 +5,11 @@
   selinux:
     policy: targeted
     state: permissive
-- name: Add the user 'blog'
+- name: Add the user 'blogapp'
   become: yes
   user:
     name: "{{blog_user}}"
-- name: Change blog user's home folder permission
+- name: Change blogapp user's home folder permission
   become: yes
   file:
     path: /home/{{blog_user}}

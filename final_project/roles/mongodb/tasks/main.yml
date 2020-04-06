@@ -1,6 +1,6 @@
 ---
 # tasks file for mongodb
-- name: install mongodb-server
+- name: install mongodb-server, mongodb
   become: true 
   package:
     name: "{{ item }}"

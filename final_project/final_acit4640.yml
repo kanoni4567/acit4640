@@ -28,33 +28,46 @@
         - always
   vars:
     secgroup_ssh_allowed_instructor_cidr: 24.80.141.154/32
-# - hosts: aws_ec2
-#   gather_facts: false
-#   tasks:
-#     - name: Wait for ec2 to become ssh reachable
-#       wait_for_connection:
-#         timeout: 60
-#       tags:
-#         - always
-#     - name: Deoploy App
-#       import_role:
-#         name: todoapp
-#       tags:
-#         - deployment
-#     - name: Info about Nginx service
-#       import_role:
-#         name: nginx
-#         tasks_from: info
-#       tags:
-#         - info
-#         - never
-#     - name: Info about todoapp service
-#       import_role:
-#         name: todoapp_service_info
-#         tasks_from: info
-#       tags:
-#         - info
-#         - never
-#   vars:
-#     todo_user: todoapp
+- hosts: aws_ec2
+  gather_facts: false
+  tasks:
+    - name: Wait for ec2 to become ssh reachable
+      wait_for_connection:
+        timeout: 90
+      tags:
+        - always
+      register: host_reachable
+    - name: Deoploy App
+      import_role:
+        name: blogapp
+      tags:
+        - deployment
+    - name: Info about Nginx service
+      import_role:
+        name: nginx
+        tasks_from: info
+      when: host_reachable is defined
+      tags:
+        - info
+        - never
+    - name: Info about todoapp service
+      import_role:
+        name: blogapp_service_info
+        tasks_from: info
+      when: host_reachable is defined
+      tags:
+        - info
+        - never
+  vars:
+    todo_user: blogapp
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Query url of deployed app
+      import_role:
+        name: aws
+        tasks_from: info
+      tags:
+        - deployment
     
