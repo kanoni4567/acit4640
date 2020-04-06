@@ -1,0 +1,7 @@
+---
+- name: Query info of nginx service
+  service:
+    name: nginx
+  register: nginx_data
+- debug:
+    msg: "nginx status: {{ nginx_data.status.ActiveState }}"

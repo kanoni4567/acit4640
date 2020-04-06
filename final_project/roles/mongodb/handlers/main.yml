@@ -1,0 +1,9 @@
+---
+# handlers file for mongodb
+# - name: Copy mongodb archive
+#   become: yes
+#   copy:
+#     src: ./files/ACIT4640
+#     dest: /home/todoapp_installation/setup/
+# - name: Restore mongo data
+#   command: mongorestore -d acit4640 /home/todoapp_installation/setup/ACIT4640

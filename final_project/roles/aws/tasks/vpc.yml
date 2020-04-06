@@ -1,0 +1,58 @@
+---
+- name: provision the VPC
+  ec2_vpc_net:
+    state: present
+    cidr_block: "{{ vpc_cidr }}"
+    region: "{{ aws_region }}"
+    multi_ok: no
+    name: "{{ vpc_prefix }}_VPC"
+  register: vpc_data
+- name: create the subnet
+  when: vpc_data is defined
+  ec2_vpc_subnet:
+    az: "{{ availability_zone }}"
+    cidr: "{{ subnet_cidr }}"
+    region: "{{ aws_region }}"
+    state: present
+    vpc_id: "{{ vpc_data.vpc.id }}"
+    tags:
+      Name: "{{ vpc_prefix }}_subnet"
+  register: subnet_data
+- debug:
+    msg: "{{ subnet_data }}"
+- name: create internet gateway
+  ec2_vpc_igw:
+    region: "{{ aws_region }}"
+    vpc_id: "{{ vpc_data.vpc.id }}"
+    tags:
+      Name: "{{ vpc_prefix }}_igw"
+  register: igw_data
+- name: create routing table
+  ec2_vpc_route_table:
+    region: "{{ aws_region }}"
+    vpc_id: "{{ vpc_data.vpc.id }}"
+    routes:
+      - dest: 0.0.0.0/0
+        gateway_id: "{{ igw_data.gateway_id }}"
+    subnets:
+      - "{{ subnet_data.subnet.id }}"
+    tags:
+      Name: "{{ vpc_prefix }}_rtable"
+- name: create security group
+  ec2_group:
+    region: "{{ aws_region }}"
+    vpc_id: "{{ vpc_data.vpc.id }}"
+    name: "{{ vpc_prefix }}_secgroup"
+    description: "{{ vpc_prefix }}_secgroup"
+    rules:
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: "{{ secgroup_ssh_allowed_instructor_cidr }}"
+    tags:
+      Name: "{{ vpc_prefix }}_secgroup"
+  register: secgroup_data

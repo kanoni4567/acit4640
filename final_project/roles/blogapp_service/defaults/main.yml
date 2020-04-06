@@ -1,0 +1,4 @@
+---
+# defaults file for blogapp_service
+blogapp_port: 8080
+blog_user: blogapp
