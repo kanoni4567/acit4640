@@ -1,0 +1,11 @@
+---
+vpc_cidr: 10.46.0.0/16
+aws_region: us-west-2
+vpc_prefix: 4640
+availability_zone: us-west-2a
+subnet_cidr: 10.46.10.0/24
+
+ami_id: ami-01ed306a12b7d1c96
+ec2_instance_type: t2.micro
+ec2_instance_name: ACIT4640_BLOG
+aws_key_name: acit4640

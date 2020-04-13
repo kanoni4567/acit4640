@@ -1,0 +1,7 @@
+---
+# tasks file for nodejs
+- name: Install nodejs
+  become: yes
+  package:
+    name: nodejs
+    state: present

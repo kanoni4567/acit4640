@@ -1,0 +1,4 @@
+---
+# defaults file for nginx
+app_path: /home/blogapp/app
+app_port: 8080

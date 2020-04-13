@@ -1,0 +1,43 @@
+---
+# tasks file for blogapp_service
+- name: Clone app repo
+  become: yes
+  git:
+    repo: https://github.com/subhasmitasahoo/BlogSite.git
+    force: yes
+    dest: /home/{{blog_user}}/app
+# - name: Change database configuration
+#   become: yes
+#   replace:
+#     path: /home/{{blog_user}}/app/config/database.js
+#     regexp: 'CHANGEME'
+#     replace: 'acit4640'
+- name: Install npm packages based on package.json.
+  become: yes
+  npm:
+    path: /home/{{blog_user}}/app
+- name: Change app folder permission
+  become: yes
+  file:
+    path: /home/{{blog_user}}/app
+    recurse: yes
+    owner: "{{blog_user}}"
+    group: "{{blog_user}}"
+    mode: '0755'
+- name: check if service file exists
+  stat: 
+    path: /etc/systemd/system/blogapp.service
+  register: blogapp_service_exist
+- name: Copy blogapp.service
+  become: yes
+  template:
+    src: ./templates/blogapp.service.j2
+    dest: /etc/systemd/system/blogapp.service
+  when: blogapp_service_exist.stat.exists == False
+- name: Enable and restart blogapp.service
+  become: yes
+  systemd: 
+    state: restarted
+    enabled: yes
+    name: blogapp
+    daemon_reload: yes
