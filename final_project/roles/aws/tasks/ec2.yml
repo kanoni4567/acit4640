@@ -1,0 +1,29 @@
+---
+- name: Create EC2 instance
+  ec2:
+    key_name: "{{ aws_key_name }}"
+    region: "{{ aws_region }}"
+    group_id: "{{ secgroup_data.group_id }}"
+    image: "{{ ami_id }}"
+    instance_type: "{{ ec2_instance_type }}"
+    instance_tags:
+      Name: "{{ ec2_instance_name }}"
+    exact_count: 1
+    count_tag:
+      Name: "{{ ec2_instance_name }}"
+    vpc_subnet_id: "{{ subnet_data.subnet.id }}"
+    wait: true
+  register: ec2_data
+- debug:
+    msg: "{{ ec2_data }}"
+- name: Create Elastic IP
+  ec2_eip:
+    state: present
+    region: "{{ aws_region }}"
+    in_vpc: true
+    device_id: "{{ ec2_data.tagged_instances[0].id }}"
+    reuse_existing_ip_allowed: true
+    release_on_disassociation: true
+  register: eip_data
+- debug:
+    msg: "Elastic IP created: {{ eip_data.public_ip }}"

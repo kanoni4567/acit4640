@@ -1,0 +1,7 @@
+---
+- name: Query info of blogapp service
+  systemd: 
+    name: blogapp
+  register: blogapp_service_data
+- debug:
+    msg: "blogapp service status: {{ blogapp_service_data.status.ActiveState }}"

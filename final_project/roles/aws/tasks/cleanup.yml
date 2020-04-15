@@ -1,0 +1,52 @@
+---
+- name: Terminate EC2 instance
+  ec2_instance:
+    state: absent
+    region: "{{ aws_region }}"
+    wait: true
+    filters:
+      tag:Name: "{{ ec2_instance_name }}"
+- name: Query VPC info
+  ec2_vpc_net:
+    cidr_block: "{{ vpc_cidr }}"
+    region: "{{ aws_region }}"
+    name: "{{ vpc_prefix }}_VPC"
+  register: vpc_data
+- debug:
+    msg: "{{ vpc_data }}"
+- name: remove subnet
+  ec2_vpc_subnet:
+    vpc_id: "{{ vpc_data.vpc.id }}"
+    az: "{{ availability_zone }}"
+    cidr: "{{ subnet_cidr }}"
+    region: "{{ aws_region }}"
+    state: absent
+    tags:
+      Name: "{{ vpc_prefix }}_subnet"
+- name: remove internet gateway
+  ec2_vpc_igw:
+    vpc_id: "{{ vpc_data.vpc.id }}"
+    state: absent
+    region: "{{ aws_region }}"
+    tags:
+      Name: "{{ vpc_prefix }}_igw"
+- name: remove routing table
+  ec2_vpc_route_table:
+    vpc_id: "{{ vpc_data.vpc.id }}"
+    state: absent
+    region: "{{ aws_region }}"
+    tags:
+      Name: "{{ vpc_prefix }}_rtable"
+- name: remove security group
+  ec2_group:
+    state: absent
+    region: "{{ aws_region }}"
+    name: "{{ vpc_prefix }}_secgroup"
+    tags:
+      Name: "{{ vpc_prefix }}_secgroup"
+- name: Remove VPC
+  ec2_vpc_net:
+    state: absent
+    cidr_block: "{{ vpc_cidr }}"
+    region: "{{ aws_region }}"
+    name: "{{ vpc_prefix }}_VPC"

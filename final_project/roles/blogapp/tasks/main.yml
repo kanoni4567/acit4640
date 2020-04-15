@@ -1,0 +1,30 @@
+---
+# tasks file for blogapp
+- name: Put SELinux in permissive mode
+  become: yes
+  selinux:
+    policy: targeted
+    state: permissive
+- name: Add the user 'blogapp'
+  become: yes
+  user:
+    name: "{{blog_user}}"
+- name: Change blogapp user's home folder permission
+  become: yes
+  file:
+    path: /home/{{blog_user}}
+    recurse: yes
+    owner: "{{blog_user}}"
+    group: "{{blog_user}}"
+    mode: '0755'
+- name: Install epel-release
+  become: yes
+  package:
+    name: epel-release
+    state: present
+- name: Install app
+  import_role:
+    name: blogapp_service
+  vars:
+    blogapp_port: 8080
+    blogapp_user: "{{blog_user}}"

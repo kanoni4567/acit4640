@@ -1,0 +1,19 @@
+---
+# tasks file for mongodb
+- name: install mongodb-server, mongodb
+  become: true 
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - mongodb-server
+    - mongodb
+  notify:
+    - Copy mongodb archive
+    - Restore mongo data
+- name: Enable and start mongod
+  become: yes
+  service:
+    name: mongod
+    enabled: yes
+    state: started
